@@ -13,8 +13,9 @@
 #include <iostream>
 #include <sstream>
 
-namespace http {
 
+
+namespace http {
 
 	Response get(std::string const& path, std::string const& data) {
 		Request request;
@@ -34,9 +35,9 @@ namespace http {
 
 	Response sendRequest(Request&request) {
 		Response resp;
-		if (request.uri.scheme() == "http") 
+		if (request.uri.scheme == "http") 
 			resp = sendHTTP(request);
-		else if (request.uri.scheme() == "https") 
+		else if (request.uri.scheme == "https") 
 			resp = sendHTTPS(request);
 		return resp;
 	}
@@ -47,10 +48,9 @@ namespace http {
 		if (WSAStartup(DllVersion, &wsaData)) {
 			return Response();
 		}
-		std::string req = str(request);
-
+		std::string req = request.to_string();
 		addrinfo* pAddrInfo;
-		getaddrinfo(request.uri.host().c_str(), "443", 0, &pAddrInfo);
+		getaddrinfo(request.uri.host.c_str(), "443", 0, &pAddrInfo);
 
 		SOCKET connection = socket(
 			pAddrInfo->ai_family,
@@ -67,7 +67,7 @@ namespace http {
 		SSL_library_init();
 		SSLeay_add_ssl_algorithms();
 		SSL_load_error_strings();
-
+		
 		const SSL_METHOD *meth = TLSv1_2_client_method();
 		SSL_CTX *ctx = SSL_CTX_new(meth);
 
@@ -96,6 +96,11 @@ namespace http {
 				result.append(buffer, bytes_recv);
 		} while (bytes_recv > 0);
 
+		closesocket(connection);
+		SSL_shutdown(ssl);
+		SSL_free(ssl);
+		SSL_CTX_free(ctx);
+
 		return Response(result);
 	}
 	Response sendHTTP(Request& request) {
@@ -105,10 +110,10 @@ namespace http {
 			return Response();
 		}
 
-		std::string req = str(request);
+		std::string req = request.to_string();
 
 		addrinfo* pAddrInfo;
-		getaddrinfo(request.uri.host().c_str(), "80", 0, &pAddrInfo);
+		getaddrinfo(request.uri.host.c_str(), "80", 0, &pAddrInfo);
 
 		SOCKET connection = socket(
 			pAddrInfo->ai_family,
@@ -136,33 +141,8 @@ namespace http {
 				result.append(buffer, bytes_recv);
 		} while (bytes_recv > 0);
 
+		closesocket(connection);
 		return Response(result);
 	}
-
-	std::string str(Request& request) {
-		std::stringstream ss;
-		ss << request.method << " /" << request.uri.path() + "?" + request.uri.args() << " HTTP/1.1\n";
-		ss << "Host: " << request.uri.host() << "\n";
-		ss << "Content-Length: " << request.body.size() << "\n";
-		ss << "Connection: close\n";
-		ss << "Accept-Encoding: identity\n";
-		for (auto header : request.headers) {
-			ss << header.first << ": " << header.second << "\n";
-		}
-		ss << "\n";
-		ss << request.body;
-		return ss.str();
-	}
-	std::string str(Response& responce) {
-		std::stringstream ss;
-		ss << "HTTP/1.1 " << responce.Status_code() << "\n\r";
-
-		for (auto& headers : responce.headers) {
-			for (auto header : headers.second)
-				ss << headers.first << ": " << header << "\n\r";
-		}
-		ss << "\n\r";
-		ss << responce.Body();
-		return ss.str();
-	}
+	
 }

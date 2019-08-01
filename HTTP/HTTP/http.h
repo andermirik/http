@@ -1,7 +1,7 @@
 #pragma once
 #include "uri.h"
 #include "request.h"
-#include "responce.h"
+#include "response.h"
 
 namespace http {
 
@@ -11,8 +11,5 @@ namespace http {
 	Response sendRequest(Request&request);
 	Response sendHTTPS(Request& request);
 	Response sendHTTP(Request& request);
-
-	std::string str(Request& request);
-	std::string str(Response& responce);
 
 }
