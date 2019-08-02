@@ -20,12 +20,12 @@ void http::Response::fromString(std::string& src) {
 	for (line; safeGetline(str, line) && line!="";) {
 		std::string header = line.substr(0, line.find(':'));
 		std::string value = line.substr(line.find(' ')+1);
-		headers[header].push_back(value);
+		headers[header] = value;
 	}
 
 	bool chunked = false;
 	if (!headers["Transfer-Encoding"].empty())
-		if(headers["Transfer-Encoding"][0]=="chunked")
+		if(headers["Transfer-Encoding"]=="chunked")
 			chunked = true;
 
 	int body_offset = src.find("\r\n\r\n") + 4;

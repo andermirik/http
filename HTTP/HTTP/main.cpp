@@ -21,7 +21,7 @@ int main() {
 	req.uri = http::Uri("https://yobit.net/api/3/ticker/ltc_btc");
 	req.headers["Hello"] = "World!";
 	req.body = "Some data";
-	
+
 	std::cout << http::sendRequest(req).to_string()<<std::endl;
 
 	return(0);

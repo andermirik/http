@@ -9,7 +9,7 @@ namespace http {
 		int status_code;
 		std::string body;
 	public:
-		std::map<std::string, std::vector<std::string>> headers;
+		std::map<std::string, std::string> headers;
 
 		Response();
 		Response(std::string& str);
