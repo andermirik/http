@@ -48,10 +48,11 @@ namespace http {
 
 		for (auto& file : files) {
 			request.body.append("--"+boundary+"\r\n");
-			request.body.append("Content-Disposition: form-data; name=\"" + file.propertyname + "\"");
-			request.body.append(file.filename == "" ? "\r\n" : "; filename=\"" + file.filename + "\"\r\n");
+			request.body.append("Content-Disposition: form-data; name=\"" + file.propertyname + "\";");
+			request.body.append(file.filename == "" ? "\r\n" : " filename=\"" + file.filename + "\";\r\n");
 			request.body.append(file.filename == "" ? "\r\n\r\n" : "Content-Type: " + get_mime(file.filename) + "\r\n\r\n");
 			request.body.append(file.filecontent);
+			request.body.append("\r\n");
 		}
 		if (!files.empty()) {
 			request.body.append("--" + boundary + "--");
