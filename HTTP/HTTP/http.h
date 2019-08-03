@@ -3,7 +3,6 @@
 #include "request.h"
 #include "response.h"
 
-
 namespace http {
 	typedef std::map<std::string, std::string> Table;
 
@@ -29,3 +28,4 @@ namespace http {
 	Response sendHTTP(Request& request);
 
 }
+namespace https = http;
